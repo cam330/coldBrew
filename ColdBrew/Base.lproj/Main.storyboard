@@ -51,6 +51,7 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
                     <connections>
+                        <outlet property="coffeeButton" destination="0dd-wU-nh6" id="r3d-c1-Gpf"/>
                         <outlet property="timeLabel" destination="TKd-Yl-sPZ" id="1bw-bS-BPh"/>
                     </connections>
                 </viewController>

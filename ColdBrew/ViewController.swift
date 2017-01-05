@@ -12,7 +12,7 @@ import UserNotifications
 
 class ViewController: UIViewController, UNUserNotificationCenterDelegate {
     var isGrantedNotificationAccess:Bool = false
-    var timeArray: NSArray = [3.0,5.0,10.0]
+    var timeArray: NSArray = [10800.0,21600.0,32400.0,43200.0,54000.0,64800.0,75600.0]
     var timer = 86400
     var countdownTimer = Timer()
     @IBOutlet var timeLabel: UILabel!
@@ -29,12 +29,28 @@ class ViewController: UIViewController, UNUserNotificationCenterDelegate {
             
             if isGrantedNotificationAccess{
                 
-                timeAtPress = Date()
-                let timeEnding = timeAtPress.timeIntervalSince1970 + 57600
-                let toDate = NSDate(timeIntervalSince1970: timeEnding)
-                print(toDate)
-                
                 countdownTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(self.countdown), userInfo: nil, repeats: true)
+                
+                //Set the content of the notification
+                let doneContent = UNMutableNotificationContent()
+                doneContent.title = "Finished"
+                doneContent.subtitle = "Your coffee done"
+                doneContent.body = "Your coldbrew is ready to drink!"
+                
+                //Set the trigger of the notification -- here a timer.
+                let trigger = UNTimeIntervalNotificationTrigger(
+                    timeInterval: 86400,
+                    repeats: false)
+                
+                //Set the request for the notification from the above
+                let doneRequest = UNNotificationRequest(
+                    identifier: "done.message",
+                    content: doneContent,
+                    trigger: trigger
+                )
+                
+                UNUserNotificationCenter.current().add(
+                    doneRequest, withCompletionHandler: nil)
                 
                 //add notification code here
                 for i in 0 ..< timeArray.count {
@@ -43,7 +59,7 @@ class ViewController: UIViewController, UNUserNotificationCenterDelegate {
                     let content = UNMutableNotificationContent()
                     content.title = "Shake"
                     content.subtitle = "Your coldbrew coffee is ready to shake"
-                    content.body = "Your cold brew will be ready at \(toDate)"
+                    content.body = "Your coldbrew will be ready soon!"
                     
                     //Set the trigger of the notification -- here a timer.
                     let trigger = UNTimeIntervalNotificationTrigger(
@@ -78,7 +94,15 @@ class ViewController: UIViewController, UNUserNotificationCenterDelegate {
         timer -= 1
         let (h, m, s) = self.secondsToHoursMinutesSeconds(seconds: timer)
         print(timer)
-        timeLabel.text = "\(h):\(m):\(s)"
+        if timer > 0 {
+            timeLabel.text = "\(h):\(m):\(s)"
+            timeLabel.font = timeLabel.font.withSize(69)
+        } else {
+//            countdownTimer.invalidate()
+            self.send10SecNotification(self.coffeeButton)
+            timeLabel.font = timeLabel.font.withSize(25)
+            timeLabel.text = "Your Cold Brew is Ready!"
+        }
     }
     
     func secondsToHoursMinutesSeconds (seconds : Int) -> (Int, Int, Int) {
